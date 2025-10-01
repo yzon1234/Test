@@ -1,30 +1,35 @@
 #include "Meta.h"
 #include "XnoteOpwConfig.h"
 
-void genAdminPassword(char* oldpassword, char* newpassword) {
+void genAdminPassword(const char* oldpassword, const char* newpassword) {
 	UINT8 OldPasswordHash[CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN];
 	UINT8 NewPasswordHash[CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN];
 	UINT8 FilePasswordHash[CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN];
-	EFI_STATUS Status;
+
 	//  2.Cal Old Passwrod Hash
 
 	int wide_len = MultiByteToWideChar(CP_ACP, 0, oldpassword, -1, NULL, 0);
 	if (wide_len <= 0) {
 		std::cerr << "Failed to calculate wide char length" << std::endl;
+		return;
 	}
 
 	CHAR16* argv_buf = (CHAR16*)malloc(wide_len * sizeof(CHAR16));
 	if (!argv_buf) {
 		std::cerr << "Memory allocation failed" << std::endl;
+		return;
 	}
 
 	int result = MultiByteToWideChar(CP_ACP, 0, oldpassword, -1, (LPWSTR)argv_buf, wide_len);
 	if (result == 0) {
 		std::cerr << "MultiByteToWideChar failed" << std::endl;
 		free(argv_buf);
+		return;
 	}
 	unsigned int hash_length = 0;
-	Status = EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), OldPasswordHash, &hash_length);
+	if(!EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), OldPasswordHash, &hash_length)){
+      return;
+	}
 
 	printf("Old Password\n");
 	for (size_t i = 0; i < CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN; i++) {
@@ -67,15 +72,19 @@ void genAdminPassword(char* oldpassword, char* newpassword) {
 	CHAR16* argv_buf2 = (CHAR16*)malloc(wide_len * sizeof(CHAR16));
 	if (!argv_buf2) {
 		std::cerr << "Memory allocation failed" << std::endl;
+		return;
 	}
 
 	result = MultiByteToWideChar(CP_ACP, 0, newpassword, -1, (LPWSTR)argv_buf2, wide_len);
 	if (result == 0) {
 		std::cerr << "MultiByteToWideChar failed" << std::endl;
 		free(argv_buf2);
+		return;
 	}
 	hash_length = 0;
-	Status = EncodePassword(argv_buf2, wcslen((const wchar_t*)argv_buf2), NewPasswordHash, &hash_length);
+	if(!EncodePassword(argv_buf2, wcslen((const wchar_t*)argv_buf2), NewPasswordHash, &hash_length)){
+      return;
+	}
 	std::ofstream outFile("admin.sign", std::ios::binary);
 	if (!outFile) {
 		std::cerr << "The file does not exist so it will be created.\n";
@@ -91,9 +100,8 @@ void genAdminPassword(char* oldpassword, char* newpassword) {
 
 }
 
-void genAdminPassword(char* newpassword) {
+void genAdminPassword(const char* newpassword) {
 	UINT8 PasswordHash[CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN];
-	EFI_STATUS Status;
 
 	if (newpassword == NULL) {
 		std::cerr << "Please Enter Password" << std::endl;
@@ -105,20 +113,25 @@ void genAdminPassword(char* newpassword) {
 	int wide_len = MultiByteToWideChar(CP_ACP, 0, newpassword, -1, NULL, 0);
 	if (wide_len <= 0) {
 		std::cerr << "Failed to calculate wide char length" << std::endl;
+		return;
 	}
 
 	CHAR16* argv_buf = (CHAR16*)malloc(wide_len * sizeof(CHAR16));
 	if (!argv_buf) {
 		std::cerr << "Memory allocation failed" << std::endl;
+		return;
 	}
 
 	int result = MultiByteToWideChar(CP_ACP, 0, newpassword, -1, (LPWSTR)argv_buf, wide_len);
 	if (result == 0) {
 		std::cerr << "MultiByteToWideChar failed" << std::endl;
 		free(argv_buf);
+		return;
 	}
 	unsigned int hash_length = 0;
-	Status = EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length);
+	if (!EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length)) {
+		return;
+	}
 
 	for (size_t i = 0; i < CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN; i++) {
 		printf("%02x ", PasswordHash[i]);

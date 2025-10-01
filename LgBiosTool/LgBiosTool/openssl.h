@@ -11,7 +11,7 @@
 const char* displayOpenSSLVersion();
 std::vector<unsigned char> sha256(std::vector<char> original_data);
 bool verify_with_public_key(std::vector<char> &hash, std::vector<unsigned char> signature, const std::string public_key_path);
-EFI_STATUS EncodePassword(CHAR16* password, UINT32 PasswordLength, unsigned char* hash, unsigned int* hash_lenghth);
+bool EncodePassword(CHAR16* password, UINT32 PasswordLength, unsigned char* hash, unsigned int* hash_lenghth);
 const std::string public_key_pem = R"(-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAonS9L4HUAcCXLWTKcrOr
 3hhbgomYqkJeuGz5ETnIyeC1Cxx4jd5Z/TFZeUojOYIiwEQTVVUezlWBN54wZ017

@@ -101,7 +101,9 @@ void OpwWritePassword(char *argv1,char *argv2){
       return;
     }
     unsigned int hash_length = 0;
-	Status = EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length);
+	if(!EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length)){
+      return;
+	}
 
 #if DEBUG_BUILD
 	for (size_t i = 0; i < CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN; i++) {

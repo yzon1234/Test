@@ -9,7 +9,6 @@
 
 
 #define CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN 16
-#define EFI_STATUS UINT32
 
 typedef unsigned __int64  UINT64;
 typedef __int64           INT64;
@@ -23,7 +22,7 @@ typedef unsigned char     UINT8;
 typedef char              CHAR8;
 typedef signed char       INT8;
 
-void genAdminPassword(char *oldpassword , char *newpassword);
-void genAdminPassword(char* newpassword);
-void genUserPassword(char* oldpassword, char* newpassword);
-void genUserPassword(char* newpassword);
+void genAdminPassword(const char *oldpassword , const char *newpassword);
+void genAdminPassword(const char* newpassword);
+void genUserPassword(const char* oldpassword, const char* newpassword);
+void genUserPassword(const char* newpassword);

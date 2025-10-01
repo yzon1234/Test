@@ -9,4 +9,4 @@
 #include <iostream>
 #include "Meta.h"
 
-EFI_STATUS EncodePassword(CHAR16* password, UINT32 PasswordLength, unsigned char* hash, unsigned int* hash_lenghth);
+bool EncodePassword(CHAR16* password, UINT32 PasswordLength, unsigned char* hash, unsigned int* hash_lenghth);

@@ -110,3 +110,4 @@ void LoadThin();
 void WriteSecurityKey(std::vector<unsigned char>& hash, std::vector<unsigned char>& signature);
 
 #endif // _XNOTE_THINCLIENT_CONFIG_H_
+#pragma pack(pop)

@@ -163,6 +163,7 @@ void restore_PE(std::vector<char> &binary_data, std::vector<unsigned char> signa
 	// Because it was hashed into binary before being signed.
 
 	PIMAGE_DOS_HEADER dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(binary_data.data());
+	if(dosHeader == NULL){return;}
 	PIMAGE_NT_HEADERS ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(binary_data.data() + dosHeader->e_lfanew);
 	PIMAGE_SECTION_HEADER sectionHeader = IMAGE_FIRST_SECTION(ntHeaders);
 
@@ -196,6 +197,7 @@ std::vector<unsigned char> read_signature_from_memory(HANDLE hModule)
 		}
 	}
 	//throw std::runtime_error(".signsec section not found.");
+	return {};
 }
 
 #pragma pack(push, 1)

@@ -76,5 +76,6 @@ bool OpwCheckPasswordIsSet(char* argv1) {
 			return TRUE;
 		}
 	}
+	return FALSE;
 
 }
