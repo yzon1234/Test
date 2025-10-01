@@ -68,22 +68,22 @@ bool PrintThin(bool print) {
 	  XnoteThinVar = (XNOTE_THINCLIENT_CONFIG *)readbuf;
 
 	  std::cout << ("=========== Device Info ==========") << std::endl;
-	  std::cout << ("WlanEnable      : ") << XnoteThinVar->ThinWlanEnable << std::endl;
-	  std::cout << ("BluetoothEnable : ") << XnoteThinVar->ThinBluetoothEnable << std::endl;
-	  std::cout << ("MicroSdEnable   : ") << XnoteThinVar->ThinMicroSdEnable << std::endl;
-	  std::cout << ("WebcamEnable    : ") << XnoteThinVar->ThinWebcamEnable << std::endl;
-	  std::cout << ("UsbPortEnable   : ") << XnoteThinVar->ThinUsbPortEnable << std::endl;
-	  std::cout << ("UsbPort1        : ") << XnoteThinVar->ThinUsbPerPort[0] << std::endl;
-	  std::cout << ("UsbPort2        : ") << XnoteThinVar->ThinUsbPerPort[1] << std::endl;
-	  std::cout << ("UsbPort3        : ") << XnoteThinVar->ThinUsbPerPort[2] << std::endl;
-	  std::cout << ("UsbPort4        : ") << XnoteThinVar->ThinUsbPerPort[3] << std::endl;
-	  std::cout << ("UsbPort5        : ") << XnoteThinVar->ThinUsbPerPort[4] << std::endl;
-	  std::cout << ("UsbPort6        : ") << XnoteThinVar->ThinUsbPerPort[5] << std::endl;
-	  std::cout << ("UsbPort7        : ") << XnoteThinVar->ThinUsbPerPort[6] << std::endl;
-	  std::cout << ("UsbBootEnable   : ") << XnoteThinVar->ThinUsbBootEnable << std::endl;
-	  std::cout << ("PxeBoot         : ") << XnoteThinVar->ThinNetworkStack << std::endl;
-	  std::cout << ("WolEnable       : ") << XnoteThinVar->ThinWolEnable << std::endl;
-	  std::cout << ("LastPowerState  : ") << XnoteThinVar->ThinLastPowerState << std::endl;
+	  std::cout << ("WlanEnable      : ") << static_cast<int>(XnoteThinVar->ThinWlanEnable) << std::endl;
+	  std::cout << ("BluetoothEnable : ") << static_cast<int>(XnoteThinVar->ThinBluetoothEnable) << std::endl;
+	  std::cout << ("MicroSdEnable   : ") << static_cast<int>(XnoteThinVar->ThinMicroSdEnable) << std::endl;
+	  std::cout << ("WebcamEnable    : ") << static_cast<int>(XnoteThinVar->ThinWebcamEnable) << std::endl;
+	  std::cout << ("UsbPortEnable   : ") << static_cast<int>(XnoteThinVar->ThinUsbPortEnable) << std::endl;
+	  std::cout << ("UsbPort1        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[0]) << std::endl;
+	  std::cout << ("UsbPort2        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[1]) << std::endl;
+	  std::cout << ("UsbPort3        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[2]) << std::endl;
+	  std::cout << ("UsbPort4        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[3]) << std::endl;
+	  std::cout << ("UsbPort5        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[4]) << std::endl;
+	  std::cout << ("UsbPort6        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[5]) << std::endl;
+	  std::cout << ("UsbPort7        : ") << static_cast<int>(XnoteThinVar->ThinUsbPerPort[6]) << std::endl;
+	  std::cout << ("UsbBootEnable   : ") << static_cast<int>(XnoteThinVar->ThinUsbBootEnable) << std::endl;
+	  std::cout << ("PxeBoot         : ") << static_cast<int>(XnoteThinVar->ThinNetworkStack) << std::endl;
+	  std::cout << ("WolEnable       : ") << static_cast<int>(XnoteThinVar->ThinWolEnable) << std::endl;
+	  std::cout << ("LastPowerState  : ") << static_cast<int>(XnoteThinVar->ThinLastPowerState) << std::endl;
 	  std::cout << ("==================================") << std::endl;
 	}
 	return TRUE;
@@ -192,22 +192,22 @@ void LoadThin(){
     memcpy(readbuf, &XnoteThinVar, sizeof(XnoteThinVar));
 
 	std::cout << ("==== BIOS CONFIG ====\n");
-	std::cout << ("WlanEnable      : ") << XnoteThinVar.ThinWlanEnable << std::endl;
-	std::cout << ("BluetoothEnable : ") << XnoteThinVar.ThinBluetoothEnable << std::endl;
-	std::cout << ("MicroSdEnable   : ") << XnoteThinVar.ThinMicroSdEnable << std::endl;
-	std::cout << ("WebcamEnable    : ") << XnoteThinVar.ThinWebcamEnable << std::endl;
-	std::cout << ("UsbPortEnable   : ") << XnoteThinVar.ThinUsbPortEnable << std::endl;
-	std::cout << ("UsbBootEnable   : ") << XnoteThinVar.ThinUsbBootEnable << std::endl;
-	std::cout << ("PxeBoot         : ") << XnoteThinVar.ThinNetworkStack << std::endl;
-	std::cout << ("WolEnable       : ") << XnoteThinVar.ThinWolEnable << std::endl;
-	std::cout << ("LastPowerState  : ") << XnoteThinVar.ThinLastPowerState << std::endl;
-	std::cout << ("UsbPerPort[1]   : ") << XnoteThinVar.ThinUsbPerPort[0] << std::endl;
-	std::cout << ("UsbPerPort[2]   : ") << XnoteThinVar.ThinUsbPerPort[1] << std::endl;
-	std::cout << ("UsbPerPort[3]   : ") << XnoteThinVar.ThinUsbPerPort[2] << std::endl;
-	std::cout << ("UsbPerPort[4]   : ") << XnoteThinVar.ThinUsbPerPort[3] << std::endl;
-	std::cout << ("UsbPerPort[5]   : ") << XnoteThinVar.ThinUsbPerPort[4] << std::endl;
-	std::cout << ("UsbPerPort[6]   : ") << XnoteThinVar.ThinUsbPerPort[5] << std::endl;
-	std::cout << ("UsbPerPort[7]   : ") << XnoteThinVar.ThinUsbPerPort[6] << std::endl;
+	std::cout << ("WlanEnable      : ") << static_cast<int>(XnoteThinVar.ThinWlanEnable) << std::endl;
+	std::cout << ("BluetoothEnable : ") << static_cast<int>(XnoteThinVar.ThinBluetoothEnable) << std::endl;
+	std::cout << ("MicroSdEnable   : ") << static_cast<int>(XnoteThinVar.ThinMicroSdEnable) << std::endl;
+	std::cout << ("WebcamEnable    : ") << static_cast<int>(XnoteThinVar.ThinWebcamEnable) << std::endl;
+	std::cout << ("UsbPortEnable   : ") << static_cast<int>(XnoteThinVar.ThinUsbPortEnable) << std::endl;
+	std::cout << ("UsbBootEnable   : ") << static_cast<int>(XnoteThinVar.ThinUsbBootEnable) << std::endl;
+	std::cout << ("PxeBoot         : ") << static_cast<int>(XnoteThinVar.ThinNetworkStack) << std::endl;
+	std::cout << ("WolEnable       : ") << static_cast<int>(XnoteThinVar.ThinWolEnable) << std::endl;
+	std::cout << ("LastPowerState  : ") << static_cast<int>(XnoteThinVar.ThinLastPowerState) << std::endl;
+	std::cout << ("UsbPerPort[1]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[0]) << std::endl;
+	std::cout << ("UsbPerPort[2]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[1]) << std::endl;
+	std::cout << ("UsbPerPort[3]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[2]) << std::endl;
+	std::cout << ("UsbPerPort[4]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[3]) << std::endl;
+	std::cout << ("UsbPerPort[5]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[4]) << std::endl;
+	std::cout << ("UsbPerPort[6]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[5]) << std::endl;
+	std::cout << ("UsbPerPort[7]   : ") << static_cast<int>(XnoteThinVar.ThinUsbPerPort[6]) << std::endl;
 
 	
 	Status = SetFirmwareEnvironmentVariable(XNOTE_THINCLIENT_CONFIG_VARIABLE_NAME, XNOTE_THINCLIENT_CONFIG_VARIABLE_GUID, readbuf, sizeof(XNOTE_THINCLIENT_CONFIG));

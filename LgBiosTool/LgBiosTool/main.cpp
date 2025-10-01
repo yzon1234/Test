@@ -7,7 +7,7 @@
 #define MAX_ITEMS 20
 #define MAX_LENGTH 256
 #define PROGRAM_VERSION      "TEST 1.0"
-#define PROGRAM_BUILD_DATE   "250924"
+#define PROGRAM_BUILD_DATE   "251010"
 
 
 char bootDescriptions[MAX_ITEMS][MAX_LENGTH];
@@ -157,12 +157,23 @@ std::string get_current_executable_path() {
 	return std::string(path);
 }
 
+std::string get_LgBiosPwTool_path() {
+
+	char currentDir[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, currentDir);
+
+	std::string toolPath = std::string(currentDir) + "\\LgBiosPwTool_signed.exe";
+	return toolPath;
+
+}
+
 void restore_PE(std::vector<char> &binary_data, std::vector<unsigned char> signature) {
 	
 	// This is a task to restore the LgBiosTool binary before signing. 
 	// Because it was hashed into binary before being signed.
 
 	PIMAGE_DOS_HEADER dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(binary_data.data());
+	if(dosHeader == NULL){return;}
 	PIMAGE_NT_HEADERS ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(binary_data.data() + dosHeader->e_lfanew);
 	PIMAGE_SECTION_HEADER sectionHeader = IMAGE_FIRST_SECTION(ntHeaders);
 
@@ -183,6 +194,7 @@ void restore_PE(std::vector<char> &binary_data, std::vector<unsigned char> signa
 std::vector<unsigned char> read_signature_from_memory(HANDLE hModule)
 {
 	PIMAGE_DOS_HEADER dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(hModule);
+	if (dosHeader == NULL) { return{}; }
 	PIMAGE_NT_HEADERS ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<BYTE*>(hModule) + dosHeader->e_lfanew);
 
 	PIMAGE_SECTION_HEADER sectionHeader = IMAGE_FIRST_SECTION(ntHeaders);
@@ -196,6 +208,7 @@ std::vector<unsigned char> read_signature_from_memory(HANDLE hModule)
 		}
 	}
 	//throw std::runtime_error(".signsec section not found.");
+	return {};
 }
 
 #pragma pack(push, 1)
@@ -249,9 +262,7 @@ std::string GetSystemFamilyName() {
 int main(int argc, char* argv[]) {
       
 	try {
-		////////////////////////////////////////////////////////////////////////////////////
-		//                           0.                                                   //
-		////////////////////////////////////////////////////////////////////////////////////
+
 		std::string familyName = GetSystemFamilyName();
 		if (familyName.empty()) {
 			std::cout << "Cannot read System Family Name!!!\n";
@@ -263,6 +274,10 @@ int main(int argc, char* argv[]) {
 		if (familyName != "LG Cloud Device") {
 			std::cout << ("This model does not support CLI Tool") << std::endl;
 		}
+		////////////////////////////////////////////////////////////////////////////////////
+        //                           0.                                                   //
+        ////////////////////////////////////////////////////////////////////////////////////
+
         if (IsDebuggerPresent()) {
             ExitProcess(0);
         }
@@ -290,7 +305,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		std::vector<unsigned char> signature = read_signature_from_memory(hModule);
-		/*
+#if DEBUG_BUILD
 		for (size_t i = 0; i < signature.size(); i++) {
 			printf("%02x ", static_cast<unsigned char>(signature[i]));
 			if ((i + 1) % 16 == 0) {
@@ -298,7 +313,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		printf("\n");
-		*/
+#endif
 
 		////////////////////////////////////////////////////////////////////////////////////
 		//                           2. Read Binary LgBiosTool                            //
@@ -320,26 +335,23 @@ int main(int argc, char* argv[]) {
 		std::vector<char> origin_data(binary_data.begin(), binary_data.begin() + origin_data_size); // delete signkey in binary
 		restore_PE(origin_data, signature);
 
+
+
 		////////////////////////////////////////////////////////////////////////////////////
 		//                            4. Verifty with public key                          //
 		////////////////////////////////////////////////////////////////////////////////////
-		/*
-		std::string filePath = "D:\\PJT\\ubtools2\\bios_app\\LgBiosTool\\x64\\Release\\binaryData.bin";
 
-		// ���Ϸ� ����
-		std::ofstream outFile2(filePath, std::ios::binary | std::ios::trunc);
-		if (!outFile2.is_open()) {
-			std::cerr << "Failed to open file for writing: " + filePath << std::endl;
-			return {};
+#if DEBUG_BUILD
+		for (size_t i = 0; i < signature.size(); i++) {
+			printf("%02x ", static_cast<char>(signature[i]));
+			if ((i + 1) % 16 == 0) {
+				printf("\n");
+			}
 		}
-		outFile2.write(reinterpret_cast<const char*>(origin_data.data()), origin_data.size());
-		outFile2.close();
-		*/
+		printf("\n");
+#endif
 
-		if (verify_with_public_key(origin_data, signature, public_key_pem)) {
-			//std::cout << " Verifiy Success" << std::endl;
-		}
-		else {
+		if (!verify_with_public_key(origin_data, signature, public_key_pem)) {
 			throw std::runtime_error("Verifiy Failed");
 		}
 
@@ -361,12 +373,13 @@ int main(int argc, char* argv[]) {
 		{
 			std::cout << "Fail_To_AdjustTokenPrivileges" << std::endl;
 		}
+
+	    std::vector<char> origin_backup = origin_data;
 #if BIOS_SECURITY_ON
         std::vector<unsigned char> hash = sha256(origin_data);
 		WriteSecurityKey(hash, signature);
 #endif
 
-		
 		if(!PrintThin(FALSE)) {return 1;}
 
 		if (argc >=2 && _stricmp(argv[1], "print") == 0) {
@@ -411,10 +424,6 @@ int main(int argc, char* argv[]) {
 
 		else if (argc >= 2 && _stricmp(argv[1], "pob") == 0) {
 			OpwWritePopStatus(argv[2]);
-		}
-
-		else if (argc >= 2 && (_stricmp(argv[1], "admin") == 0 || _stricmp(argv[1], "user") == 0)) {
-			OpwWritePassword(argv[1], argv[2]);
 		}
 
 		else if (argc >= 2 && _stricmp(argv[1], "set") == 0) {

@@ -21,3 +21,7 @@ typedef unsigned char     UINT8;
 typedef char              CHAR8;
 typedef signed char       INT8;
 void Useage();
+
+std::string get_LgBiosPwTool_path();
+void restore_PE(std::vector<char>& binary_data, std::vector<unsigned char> signature);
+std::vector<unsigned char> read_signature_from_memory(HANDLE hModule);

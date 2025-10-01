@@ -1,5 +1,5 @@
 #include "XnoteOpwConfig.h"
-
+#include "Meta.h"
 #define CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN 16
 
 void OpwReadPopStatus() {
@@ -71,6 +71,7 @@ void OpwCheckPasswordIsSet(char *argv1){
   }
  
 }
+/*
 void OpwWritePassword(char *argv1,char *argv2){
 	
 	if(argv2 == NULL){
@@ -101,7 +102,9 @@ void OpwWritePassword(char *argv1,char *argv2){
       return;
     }
     unsigned int hash_length = 0;
-	Status = EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length);
+	if(!EncodePassword(argv_buf, wcslen((const wchar_t*)argv_buf), PasswordHash, &hash_length)){
+      return;
+	}
 
 #if DEBUG_BUILD
 	for (size_t i = 0; i < CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN; i++) {
@@ -126,31 +129,74 @@ void OpwWritePassword(char *argv1,char *argv2){
 
 	Status = SetFirmwareEnvironmentVariable(User_Name, XNOTE_OPW_VARIABLE_GUID, PasswordHash, sizeof(PasswordHash));
 	if (Status == 0) {
-		std::cout << ("OpwWritePassword : Failed to set the variable : ") << GetLastError() << std::endl;
+		std::cout << ("Failed to set the password : ") << GetLastError() << std::endl;
 		return;
 	}
 	std::cout << ("Password has been set successfully.") << std::endl;
 
 	return;
 }
-
+*/
 void OpwWritePassword2(char *argv2){
 	UINT8 FilePasswordHash[CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN];
+	std::vector<unsigned char> signature(256);
     EFI_STATUS Status;
-	if(argv2 == NULL){
+	 char User_Name[20];
+	 std::string filename;
+
+	if( _stricmp(argv2, "admin") == 0 ){
+        filename = "admin.sign";
+		strcpy_s(User_Name, sizeof(User_Name), XNOTE_OPW_VARIABLE_NAME);
+	}
+	else if ( _stricmp(argv2, "user") == 0 ){
+	    filename = "user.sign";
+		strcpy_s(User_Name, sizeof(User_Name), XNOTE_OPW_USER_VARIABLE_NAME);
+	}
+	else{
 		std::cout << "Please check useage." << std::endl;
 		return;
 	}
-	std::cout << "OpwWritePassword\n" << std::endl;
 
-	std::ifstream inFile("admin.sign", std::ios::binary);
+	std::ifstream inFile(filename, std::ios::binary);
 	if (!inFile) {
-		std::cerr << "Cannot open admin.sign file.\n";
+		std::cerr << "Cannot open " << filename << " file.\n";
 	}
 
 	inFile.read(reinterpret_cast<char*>(FilePasswordHash), CONFIG_SYSTEM_CREDENTIAL_PASSWORD_HASH_LEN);
+	if (_stricmp(argv2, "admin") == 0) {
+		inFile.read(reinterpret_cast<char*>(signature.data()), signature.size());
+
+		////////////////////////////////////////////////////////////////////////////////////
+		//                           2. Read Binary LgBiosTool                            //
+		////////////////////////////////////////////////////////////////////////////////////
+		std::string exePath = get_LgBiosPwTool_path();
+		std::ifstream file(exePath, std::ios::binary);
+		if (!file.is_open()) {
+			throw std::runtime_error("Failed to open the executable file: " + exePath);
+		}
+
+		std::vector<char> binary_data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		file.close();
+
+		////////////////////////////////////////////////////////////////////////////////////
+		//                           3. Restore Original Binary                           //
+		////////////////////////////////////////////////////////////////////////////////////
+		size_t origin_data_size = binary_data.size() - signature.size();
+
+		std::vector<char> origin_data(binary_data.begin(), binary_data.begin() + origin_data_size); // delete signkey in binary
+		restore_PE(origin_data, signature);
+
+		////////////////////////////////////////////////////////////////////////////////////
+		//                            4. Verifty with public key                          //
+		////////////////////////////////////////////////////////////////////////////////////
+		if (!verify_with_public_key(origin_data, signature, public_key_pem)) {
+			throw std::runtime_error("Verifiy Failed");
+		}
+	}
+	
+
 	if (!inFile) {
-		std::cerr << "Cannot read amin.sign file.\n";
+		std::cerr << "Cannot read " << filename << " file.\n";
 	}
 	inFile.close();
 
@@ -164,20 +210,9 @@ void OpwWritePassword2(char *argv2){
 	printf("\n");
 #endif
 
-    char User_Name[20];
-	if( _stricmp(argv2, "admin") == 0 ){
-      strcpy(User_Name, XNOTE_OPW_VARIABLE_NAME);
-	}
-	else if ( _stricmp(argv2, "user") == 0 ){
-	  strcpy(User_Name, XNOTE_OPW_USER_VARIABLE_NAME);
-	}
-	else{
-	  Useage();
-	}
-
 	Status = SetFirmwareEnvironmentVariable(User_Name, XNOTE_OPW_VARIABLE_GUID, FilePasswordHash, sizeof(FilePasswordHash));
 	if (Status == 0) {
-		std::cout << ("OpwWritePassword : Failed to set the variable : ") << GetLastError() << std::endl;
+		std::cout << ("Failed to set the password : ") << GetLastError() << std::endl;
 		return;
 	}
 	std::cout << ("Password has been set successfully.") << std::endl;

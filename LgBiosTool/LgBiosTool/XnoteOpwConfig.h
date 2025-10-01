@@ -28,6 +28,5 @@ typedef struct _XNOTE_OPW_STS_VARIABLE {
 
 void OpwReadPopStatus();
 void OpwWritePopStatus(char* argv);
-void OpwWritePassword(char *argv1,char *argv2);
 void OpwCheckPasswordIsSet(char *argv1);
-void OpwWritePassword2(char* argv2);
+void OpwWritePassword2(char *argv2);

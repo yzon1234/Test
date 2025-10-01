@@ -29,21 +29,6 @@ bool checkOpwReadHash(UINT8 * OldPasswordHash) {
 		return TRUE;
 	}
 	return FALSE;
-
-	
-    
-//	XNOTE_OPW_VARIABLE* XnoteOpwStatusVar = NULL;
-//	DWORD pBufferSize;
-//	BYTE readbuf[sizeof(XNOTE_OPW_STS_VARIABLE)] = { 0, };
-//
-//	pBufferSize = GetFirmwareEnvironmentVariable(XNOTE_OPW_POB_VARIABLE_NAME, XNOTE_OPW_VARIABLE_GUID, readbuf, sizeof(XNOTE_OPW_STS_VARIABLE));
-//	if (pBufferSize == 0) {
-//		std::cout << ("Failed to get the variable : %d \n", GetLastError()) << std::endl;
-//		return;
-//	}
-//
-//	XnoteOpwStatusVar = (XNOTE_OPW_STS_VARIABLE*)readbuf;
-//	printf("PobSts : %d\n", XnoteOpwStatusVar->PobSts);
 }
 
 bool OpwCheckPasswordIsSet(char* argv1) {
@@ -64,17 +49,21 @@ bool OpwCheckPasswordIsSet(char* argv1) {
 			return FALSE;
 		}
 		else if (XnoteOpwStatusVar->AdminSts == 1){
-			std::cout << "A password has been set. Please enter your previous password." << std::endl;
+			std::cout << "A password has been set. Please enter your previous admin password." << std::endl;
 			return TRUE;
 		}
 	}
+
 	else if (_stricmp(argv1, "user") == 0) {
-		if (XnoteOpwStatusVar->UserSts == 0) {
+		if (XnoteOpwStatusVar->AdminSts == 0) {
+			std::cout << "Please set admin password first." << std::endl;
+			return TRUE;
+		}
+		else {
 			return FALSE;
 		}
-		else if (XnoteOpwStatusVar->UserSts == 1) {
-			return TRUE;
-		}
 	}
+
+	return TRUE;
 
 }
